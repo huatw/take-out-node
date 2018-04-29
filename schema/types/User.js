@@ -1,9 +1,11 @@
 const {
   GraphQLObjectType,
-  GraphQLString
+  GraphQLString,
+  GraphQLList
 } = require('graphql')
 
 const AddressType = require('./Address')
+const RestaurantType = require('./Restaurant')
 
 const UserType = new GraphQLObjectType({
   name: 'UserType',
@@ -15,12 +17,8 @@ const UserType = new GraphQLObjectType({
       type: GraphQLString,
       resolve: ({ createtime }) => createtime.toISOString()
     },
-    address: {
-      type: AddressType,
-      resolve: ({ address }) => {
-        return Address.load({ _id: address })
-      }
-    }
+    address: { type: AddressType },
+    saved: { type: new GraphQLList(RestaurantType) }
   }
 })
 

@@ -4,6 +4,8 @@ const {
   GraphQLInt
 } = require('graphql')
 
+const { Food } = require('../../models')
+
 const OrderType = require('./Order')
 const UserType = require('./User')
 const FoodType = require('./Food')
@@ -13,10 +15,10 @@ const OrderFoodType = new GraphQLObjectType({
   fields: {
     id: { type: GraphQLID },
     quantity: { type: GraphQLInt },
-    price: { type: GraphQLInt }, // quantity * food price
-    food: { type: FoodType },
-    order: { type: OrderType },
-    user: { type: UserType }
+    food: {
+      type: FoodType,
+      resolve: ({ food }) => Food.load(food)
+    },
   }
 })
 

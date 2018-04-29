@@ -1,32 +1,28 @@
 const passport = require('passport')
 
-const loginHOC = fn => requireLogoutHOC((...args) => {
-  const { username, password } = args[1]
-  const req = args[2]
+const login = ({ req, username, password }) => new Promise((res, rej) => {
+  passport.authenticate('local', (e, user, message) => {
+    if (e) {
+      return rej(e)
+    }
 
-  return new Promise((res, rej) => {
-    passport.authenticate('local', (e, user, message) => {
-      if (e) {
-        return rej(e)
+    if (!user) {
+      return rej(message)
+    }
+
+    req.login(user, (err) => {
+      if (err) {
+        return rej(err)
       }
 
-      if (!user) {
-        return rej(message)
-      }
-
-      req.login(user, (err) => {
-        if (err) {
-          return rej(err)
-        }
-
-        res(fn(...args))
-      })
-    })({ body: { username, password } })
-  })
+      res(req.user)
+    })
+  })({ body: { username, password } })
 })
 
-const requireLoginHOC = fn => (...args) => {
+const requireLoginHOF = fn => (...args) => {
   const req = args[2]
+
   if (!req.isAuthenticated()) {
     throw Error('Please Login first.')
   }
@@ -34,7 +30,7 @@ const requireLoginHOC = fn => (...args) => {
   return fn(...args)
 }
 
-const requireLogoutHOC = fn => (...args) => {
+const requireLogoutHOF = fn => (...args) => {
   const req = args[2]
   if (req.isAuthenticated()) {
     throw Error('Already logged in.')
@@ -44,9 +40,7 @@ const requireLogoutHOC = fn => (...args) => {
 }
 
 module.exports = {
-  requireLoginHOC,
-  requireLogoutHOC,
-  loginHOC,
-  // requireUserAuth,
-  // requireRatingAuth
+  requireLoginHOF,
+  requireLogoutHOF,
+  login,
 }

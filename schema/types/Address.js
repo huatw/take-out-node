@@ -1,18 +1,19 @@
 const {
   GraphQLObjectType,
   GraphQLString,
+  GraphQLFloat,
+  GraphQLList,
   GraphQLID
 } = require('graphql')
 
 const AddressType = new GraphQLObjectType({
   name: 'AddressType',
   fields: {
-    id: { type: GraphQLID },
-    postcode: { type: GraphQLString },
+    full: { type: GraphQLString },
     state: { type: GraphQLString },
     city: { type: GraphQLString },
     street: { type: GraphQLString },
-    gps: { type: GraphQLString }
+    gps: { type: new GraphQLList(GraphQLFloat) }
   }
 })
 

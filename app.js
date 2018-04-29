@@ -17,12 +17,7 @@ const isProd = process.env.NODE_ENV === 'production'
 
 const app = express()
 
-if (!isProd) {
-  app.use(cors({
-    credentials: true,
-    origin: 'http://localhost:3000'
-  }))
-}
+app.use(cors({}))
 
 app.set('x-powered-by', false)
 app.use(morgan('dev'))
@@ -47,9 +42,9 @@ app.use('/graphql', expressGraphQL(req => ({
     : ({ message})
 })))
 
-// 404 handler, return main page, let front-end router handles.
+// 404 handler
 app.use('*', (req, res) => {
-  res.status(404).sendFile(path.join(PUBLIC_PATH, './index.html'))
+  res.status(404).json({ error: 'page not found' })
 })
 
 // fall safe, catch all error
@@ -63,7 +58,7 @@ const startServer = () => app.listen(SERVER_PORT, () => {
 })
 
 mongoose
-  .connect(DB_PATH, { useMongoClient: true, autoIndex: true })
+  .connect(DB_PATH, { autoIndex: true })
   .then(
     () => console.log(`mongo started at port: ${DB_PATH}`),
     e => console.log('mongo error:', e)

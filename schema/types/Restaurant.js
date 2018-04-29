@@ -1,11 +1,15 @@
 const {
   GraphQLObjectType,
   GraphQLString,
-  GraphQLID
+  GraphQLID,
+  GraphQLList,
+  GraphQLInt
 } = require('graphql')
 
+const { Food } = require('../../models')
+
 const AddressType = require('./Address')
-const OwnerType = require('./Owner')
+const FoodType = require('./Food')
 
 const RestaurantType = new GraphQLObjectType({
   name: 'RestaurantType',
@@ -24,7 +28,15 @@ const RestaurantType = new GraphQLObjectType({
       resolve: ({ updatetime }) => updatetime.toISOString()
     },
     address: { type: AddressType },
-    owner: { type: OwnerType }
+    nsaved: { type: GraphQLInt },
+    nsale: { type: GraphQLInt },
+    price: { type: GraphQLInt },
+    nrating: { type: GraphQLInt },
+    rating: { type: GraphQLInt },
+    foods: {
+      type: new GraphQLList(FoodType),
+      resolve: ({ id }) => Food.loadByRestaurant(id)
+    }
   }
 })
 

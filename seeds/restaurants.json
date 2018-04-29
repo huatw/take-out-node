@@ -1,0 +1,92 @@
+[
+  {
+    "name": "restaurant1",
+    "cuisine": "cuisine1",
+    "description": "description1",
+    "address": {
+      "full": "full address1",
+      "gps": [40.73, -73.99]
+    }
+  },
+  {
+    "name": "restaurant2",
+    "cuisine": "cuisine2",
+    "description": "description2",
+    "address": {
+      "full": "full address2",
+      "gps": [40.74, -73.98]
+    }
+  },
+  {
+    "name": "restaurant3",
+    "cuisine": "cuisine3",
+    "description": "description3",
+    "address": {
+      "full": "full address3",
+      "gps": [40.75, -73.98]
+    }
+  },
+  {
+    "name": "restaurant4",
+    "cuisine": "cuisine4",
+    "description": "description4",
+    "address": {
+      "full": "full address4",
+      "gps": [40.75, -73.981]
+    }
+  },
+  {
+    "name": "restaurant5",
+    "cuisine": "cuisine5",
+    "description": "description5",
+    "address": {
+      "full": "full address5",
+      "gps": [40.75, -73.982]
+    }
+  },
+  {
+    "name": "restaurant6",
+    "cuisine": "cuisine6",
+    "description": "description6",
+    "address": {
+      "full": "full address6",
+      "gps": [40.75, -73.983]
+    }
+  },
+  {
+    "name": "restaurant7",
+    "cuisine": "cuisine7",
+    "description": "description7",
+    "address": {
+      "full": "full address7",
+      "gps": [40.75, -73.984]
+    }
+  },
+  {
+    "name": "restaurant8",
+    "cuisine": "cuisine8",
+    "description": "description8",
+    "address": {
+      "full": "full address8",
+      "gps": [40.75, -73.985]
+    }
+  },
+  {
+    "name": "restaurant9",
+    "cuisine": "cuisine9",
+    "description": "description9",
+    "address": {
+      "full": "full address9",
+      "gps": [40.75, -73.986]
+    }
+  },
+  {
+    "name": "restaurant0",
+    "cuisine": "cuisine0",
+    "description": "description0",
+    "address": {
+      "full": "full address0",
+      "gps": [40.75, -73.987]
+    }
+  }
+]

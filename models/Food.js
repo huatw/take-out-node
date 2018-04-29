@@ -24,7 +24,10 @@ const FoodSchema = mongoose.Schema({
 
 FoodSchema.statics = {
   load (_id) {
-    return this.findOne({ _id }).exec()
+    return this.findById(_id)
+  },
+  loadByRestaurant (restaurant) {
+    return this.find({ restaurant })
   }
 }
 

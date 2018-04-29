@@ -4,10 +4,13 @@ const {
 
 const NAME = 0
 const CUISINE = 1
-const LATEST = 2
+const CHEAP = 2
+const QUICK = 3
+const SAVED = 4
+const HOT = 5
 
 const SearchType = new GraphQLEnumType({
-  name: 'SearchType',
+  name: 'Search',
   description: 'search restaurant by type',
   values: {
     NAME: {
@@ -18,9 +21,21 @@ const SearchType = new GraphQLEnumType({
       value: CUISINE,
       description: 'search by restaurant cuisine'
     },
-    LATEST: {
-     value: LATEST,
-     description: 'search by latest update'
+    CHEAP: {
+      value: CHEAP,
+      description: 'search by price'
+    },
+    QUICK: {
+      value: QUICK,
+      description: 'search by distance'
+    },
+    SAVED: {
+      value: SAVED,
+      description: 'search by saved'
+    },
+    HOT: {
+      value: HOT,
+      description: 'search by popularity'
     }
   }
 })
@@ -29,5 +44,8 @@ module.exports = {
   SearchType,
   NAME,
   CUISINE,
-  LATEST
+  CHEAP,
+  QUICK,
+  SAVED,
+  HOT
 }

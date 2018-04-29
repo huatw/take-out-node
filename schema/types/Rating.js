@@ -1,7 +1,8 @@
 const {
   GraphQLObjectType,
   GraphQLString,
-  GraphQLID
+  GraphQLID,
+  GraphQLInt
 } = require('graphql')
 
 const OrderType = require('./Order')
@@ -14,10 +15,9 @@ const RatingType = new GraphQLObjectType({
     content: { type: GraphQLString },
     createtime: {
       type: GraphQLString,
-      resolve: ({ createtime }) => createtime.toISOString()
+      resolve: ({ createtime }) => createtime && createtime.toISOString()
     },
-    order: { type: OrderType },
-    user: { type: UserType }
+    stars: { type: GraphQLInt }
   }
 })
 

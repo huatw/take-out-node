@@ -1,6 +1,9 @@
 const mongoose = require('mongoose')
 const bcrypt = require('bcrypt')
 
+const AddressSchema = require('./Address')
+const Restaurant = require('./Restaurant')
+
 const { THUMB_NAIL_USER, SALT_ROUNDS } = require('../config')
 
 const UserSchema = mongoose.Schema({
@@ -17,17 +20,17 @@ const UserSchema = mongoose.Schema({
     required: true,
     minlength: 1
   },
-  thumbnail: {type: String, default: THUMB_NAIL_USER},
+  thumbnail: { type: String, default: THUMB_NAIL_USER },
   createtime: {
     type: Date,
     default: Date.now,
     required: true
   },
-  address: { // foreign key
+  saved: [{
     type: mongoose.Schema.Types.ObjectId,
-    ref : 'Address',
-    index: true
-  }
+    ref : 'Restaurant'
+  }],
+  address: AddressSchema // not using it yet.
 })
 
 // auto hash password before saving
@@ -50,12 +53,32 @@ UserSchema.methods = {
 
 UserSchema.statics = {
   load (username) {
-    return this.findOne({ username }).exec()
+    return this.findOne({ username }).populate('saved')
   },
   register ({ username, password, nickname }) {
     const user = new this({ username, password, nickname })
 
     return user.save()
+  },
+  async saveRestaurant (_id, restaurant) {
+    await Restaurant.incNSaved(restaurant)
+
+    const user = await this.findByIdAndUpdate(
+      _id,
+      { $push: { saved: restaurant} }
+    )
+
+    return user
+  },
+  async unsaveRestaurant (_id, restaurant) {
+    await Restaurant.decNSaved(restaurant)
+
+    const user = await this.findByIdAndUpdate(
+      _id,
+      { $pull: { saved: restaurant} }
+    )
+
+    return user
   }
 }
 

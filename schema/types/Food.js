@@ -6,11 +6,11 @@ const {
   GraphQLInt
 } = require('graphql')
 
-const RestaurantType = require('./Restaurant')
+const { Restaurant } = require('../../models')
 
 const FoodType = new GraphQLObjectType({
   name: 'FoodType',
-  fields: {
+  fields: () => ({
     id: { type: GraphQLID },
     name: { type: GraphQLString },
     cuisine: { type: GraphQLString },
@@ -22,8 +22,11 @@ const FoodType = new GraphQLObjectType({
       type: GraphQLString,
       resolve: ({ createtime }) => createtime.toISOString()
     },
-    restaurant: { type: RestaurantType }
-  }
+    restaurant: {
+      type: require('./Restaurant'), // circular dependency...
+      resolve: ({ restaurant }) => Restaurant.load(restaurant)
+    }
+  })
 })
 
 module.exports = FoodType

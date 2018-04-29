@@ -5,10 +5,12 @@
   "license": "MIT",
   "scripts": {
     "start": "NODE_ENV=production node app.js",
-    "dev": "nodemon app.js"
+    "dev": "nodemon app.js",
+    "seed": "node seeds"
   },
   "dependencies": {
-    "bcrypt": "^1.0.3",
+    "axios": "^0.18.0",
+    "bcrypt": "^2.0.1",
     "body-parser": "^1.18.2",
     "cookie-parser": "^1.4.3",
     "cors": "^2.8.4",
@@ -16,7 +18,7 @@
     "express-graphql": "^0.6.12",
     "express-session": "^1.15.6",
     "graphql": "^0.13.2",
-    "mongoose": "^4.13.4",
+    "mongoose": "^5.0.16",
     "morgan": "^1.9.0",
     "only": "^0.0.2",
     "passport": "^0.4.0",
