@@ -13,8 +13,10 @@ mongoose.Promise = global.Promise
 const addRestaurants = async (restaurants) =>
   Restaurant.insertMany(restaurants)
 
-const addUsers = async (users) =>
-  User.insertMany(users)
+const addUsers = async (users) => Promise.all(
+  users.map(user => User.register({ ...user }))
+)
+
 
 /**
  * user1 add 1 restaurants, user2 add 2...
@@ -81,10 +83,15 @@ const addOrders = async (orders, userIds, restaurantIds, foodRestaurantIds) => P
  * @param  {Order[][][]} orderRestaurantUserArr
  * @return {Order[][][]|Promise}
  */
-const mockCompleteAndRating = async (orderRestaurantUserArr) => Promise.all(
-  orderRestaurantUserArr.map(orderRestaurantArr => Promise.all(
+const mockCompleteAndRating = async (orderRestaurantUserArr, userIds) => Promise.all(
+  orderRestaurantUserArr.map((orderRestaurantArr, index) => Promise.all(
     orderRestaurantArr.map(orderArr => Promise.all(
-      orderArr.map(order => Order.complete(order._id, 'great!', 5))
+      orderArr.map(order => Order.complete(
+        order._id,
+        userIds[index],
+        'great!',
+        5
+      ))
     ))
   ))
 )
@@ -97,15 +104,19 @@ const mockCompleteAndRating = async (orderRestaurantUserArr) => Promise.all(
  * 4 Rating dependent on Order
  */
 async function runSeed () {
-  const restaurantArr = await addRestaurants(restaurants)
-  const restaurantIds = restaurantArr.map(restaurant => restaurant._id)
+  const [restaurantArr, userArr] = await Promise.all([
+    addRestaurants(restaurants),
+    addUsers(users)
+  ])
 
-  const userArr = await addUsers(users)
+  const restaurantIds = restaurantArr.map(restaurant => restaurant._id)
   const userIds = userArr.map(user => user._id)
 
-  await mockSave(userIds, restaurantIds)
+  const [foodRestaurantArr] = await Promise.all([
+    addFoods(foods, restaurantIds),
+    mockSave(userIds, restaurantIds)
+  ])
 
-  const foodRestaurantArr = await addFoods(foods, restaurantIds)
   const foodRestaurantIds = foodRestaurantArr.map(
     foodArr => foodArr.map(({ _id }) => _id)
   )
@@ -117,7 +128,7 @@ async function runSeed () {
     foodRestaurantIds
   )
 
-  await mockCompleteAndRating(orderRestaurantUserArr)
+  await mockCompleteAndRating(orderRestaurantUserArr, userIds)
 }
 
 mongoose

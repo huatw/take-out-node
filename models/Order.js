@@ -84,43 +84,75 @@ OrderSchema.statics = {
       price
     })
 
-    /* Restaurant aggregation data update */
-    await Restaurant.updateSale(restaurant, price)
-
     return order.save()
   },
-  async complete (_id, content, stars = 5) {
-    const order = await this.findByIdAndUpdate(
-      _id,
+  async complete (_id, user, content, stars = 5) { // check user
+    const order = await this.findOneAndUpdate(
+      { _id, user },
       {
         $set: {
           status: 1,
+          finishtime: Date.now(),
           rating: {
             content,
             stars,
             createtime: Date.now()
           }
         }
-      }
+      },
+      { new: true }
+    )
+
+    if (!order) {
+      throw Error('not your order.')
+    }
+
+    /* Restaurant aggregation data update */
+    await Restaurant.updateSale(order.restaurant, order.price)
+    await Restaurant.updateRating(order.restaurant, stars)
+
+    return order
+  },
+  async cancel (_id, user) {
+    const order = await this.findOneAndUpdate(
+      { _id, user },
+      {
+        $set: {
+          finishtime: Date.now(),
+          status: 2
+        }
+      },
+      { new: true }
     )
 
     return order
   },
-  async cancel (_id) {
-    const order = await this.findByIdAndUpdate(
-      _id,
-      { $set: { status: 2 } }
-    )
-
-    /* Restaurant aggregation data update */
-    await Restaurant.updateSale(order.restaurant, -order.price)
-
-    return order
+  load (_id) {
+    return this.findById(_id)
   },
   loadByUser (user) {
     return this.find({ user })
       .sort({ createtime: -1 })
   },
+  async loadRatingByRestaurant (restaurant) {
+    const orders = await this
+      .find({ restaurant })
+      .populate('user')
+      .sort({ createtime: -1 })
+
+    const ratings = orders
+      .filter(order => order.rating)
+      .map(({ user: { nickname }, rating }) => ({
+        // ...rating, // cannot destructor rating using ...
+        id: rating._id,
+        content: rating.content,
+        stars: rating.stars,
+        createtime: rating.createtime,
+        nickname
+      }))
+
+    return ratings
+  }
 }
 
 module.exports = mongoose.model('Order', OrderSchema)

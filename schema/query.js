@@ -21,6 +21,7 @@ const {
   CHEAP,
   QUICK,
   SAVED,
+  RATING,
   HOT
 } = require('./types/Search')
 
@@ -30,7 +31,9 @@ const {
 } = require('../middlewares/authorization')
 
 const {
-  Restaurant
+  Restaurant,
+  Order,
+  Food,
 } = require('../models')
 
 const { getAddress } = require('../middlewares/gps')
@@ -70,6 +73,8 @@ const Query = new GraphQLObjectType({
             return Restaurant.loadByPrice(gps)
           case HOT:
             return Restaurant.loadByHot(gps)
+          case RATING:
+            return Restaurant.loadByRating(gps)
           case SAVED:
             return req.user.saved
         }
@@ -80,15 +85,16 @@ const Query = new GraphQLObjectType({
       args: { id: { type: new GraphQLNonNull(GraphQLID) } },
       resolve: (_, { id }) => Restaurant.load(id)
     },
-    orders: {
-      type: new GraphQLList(OrderType),
-      resolve: requireLoginHOF((_, args, req) => Order.loadByUser(req.user._id))
-    },
-    /*TODO*/
     food: {
       type: FoodType,
       args: { id: { type: new GraphQLNonNull(GraphQLID) } }, // food id
       resolve: (_, { id }) => Food.load(id)
+    },
+    orders: {
+      type: new GraphQLList(OrderType),
+      resolve: requireLoginHOF((_, args, req) =>
+        Order.loadByUser(req.user._id)
+      )
     },
     order: {
       type: OrderType,
@@ -98,13 +104,8 @@ const Query = new GraphQLObjectType({
     restaurantRatings: {
       type: new GraphQLList(RatingType),
       args: { id: { type: new GraphQLNonNull(GraphQLID) } }, // restaurant id
-      resolve: (_, { id }) => Rating.loadByRestaurant(id)
-    },
-    rating: {
-      type: RatingType,
-      args: { id: { type: new GraphQLNonNull(GraphQLID) } },
-      resolve: (_, { id }) => Rating.load(id)
-    },
+      resolve: (_, { id }) => Order.loadRatingByRestaurant(id)
+    }
   })
 })
 

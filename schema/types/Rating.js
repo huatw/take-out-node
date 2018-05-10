@@ -12,6 +12,7 @@ const RatingType = new GraphQLObjectType({
   name: 'RatingType',
   fields: {
     id: { type: GraphQLID },
+    nickname: { type: GraphQLString },
     content: { type: GraphQLString },
     createtime: {
       type: GraphQLString,

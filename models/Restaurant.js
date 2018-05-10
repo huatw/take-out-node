@@ -44,15 +44,22 @@ const RestaurantSchema = mongoose.Schema({
   },
   price: {
     type: Number,
+    default: 0
+  },
+  avgprice: {
+    type: Number,
     index: true,
     default: 0
   },
   nrating: {
     type: Number,
-    index: true,
     default: 0
   },
   rating: {
+    type: Number,
+    default: 0
+  },
+  avgrating: {
     type: Number,
     index: true,
     default: 0
@@ -60,28 +67,44 @@ const RestaurantSchema = mongoose.Schema({
 })
 
 RestaurantSchema.statics = {
-  updateRating (_id, rating) {
-    return this.findByIdAndUpdate(
+  async updateRating (_id, rating) {
+    const restaurant = await this.findByIdAndUpdate(
       _id,
-      { $inc: { nrating: rating > 0 ? 1 : -1, rating } }
+      { $inc: { nrating: rating > 0 ? 1 : -1, rating } },
+      { new: true }
     )
+
+    if (restaurant.nrating) {
+      restaurant.avgrating = restaurant.rating / restaurant.nrating
+    }
+
+    return restaurant.save()
   },
-  updateSale (_id, price) {
-    return this.findByIdAndUpdate(
+  async updateSale (_id, price) {
+    const restaurant = await this.findByIdAndUpdate(
       _id,
-      { $inc: { nsale: price > 0 ? 1 : -1, price } }
+      { $inc: { nsale: price > 0 ? 1 : -1, price } },
+      { new: true }
     )
+
+    if (restaurant.nsale) {
+      restaurant.avgprice = restaurant.price / restaurant.nsale
+    }
+
+    return restaurant.save()
   },
   incNSaved (_id) {
     return this.findByIdAndUpdate(
       _id,
-      { $inc: { nsaved: 1 }}
+      { $inc: { nsaved: 1 }},
+      { new: true }
     )
   },
   decNSaved (_id) {
     return this.findByIdAndUpdate(
       _id,
-      { $dec: { nsaved: 1 }}
+      { $inc: { nsaved: -1 }},
+      { new: true }
     )
   },
   load (_id) {
@@ -126,7 +149,9 @@ RestaurantSchema.statics = {
         $near: gps,
         $maxDistance: 10 / 111 // 10km
       }
-    }).sort({ avgprice: 1 }).limit(20)
+    })
+      .sort({ avgprice: 1 })
+      .limit(20)
   },
   loadByHot (gps) {
     if (gps.length !== 2) {
@@ -138,7 +163,23 @@ RestaurantSchema.statics = {
         $near: gps,
         $maxDistance: 10 / 111 // 10km
       }
-    }).sort({ nsaved: -1 }).limit(20)
+    })
+      .sort({ nsaved: -1 })
+      .limit(20)
+  },
+  loadByRating (gps) {
+    if (gps.length !== 2) {
+      throw Error('invalid GPS')
+    }
+
+    return this.find({
+      'address.gps': {
+        $near: gps,
+        $maxDistance: 10 / 111 // 10km
+      }
+    })
+      .sort({ avgrating: -1 })
+      .limit(20)
   }
 }
 

@@ -60,25 +60,31 @@ UserSchema.statics = {
 
     return user.save()
   },
-  async saveRestaurant (_id, restaurant) {
-    await Restaurant.incNSaved(restaurant)
-
-    const user = await this.findByIdAndUpdate(
+  async isSaved (_id, restaurant) {
+    const user = await this.findOne({
       _id,
-      { $push: { saved: restaurant} }
+      saved: restaurant
+    })
+
+    return user ? true : false
+  },
+  async saveRestaurant (_id, restaurant) {
+    await this.findByIdAndUpdate(
+      _id,
+      { $push: { saved: restaurant} },
+      { new: true }
     )
 
-    return user
+    return Restaurant.incNSaved(restaurant)
   },
   async unsaveRestaurant (_id, restaurant) {
-    await Restaurant.decNSaved(restaurant)
-
-    const user = await this.findByIdAndUpdate(
+    await this.findByIdAndUpdate(
       _id,
-      { $pull: { saved: restaurant} }
+      { $pull: { saved: restaurant} },
+      { new: true }
     )
 
-    return user
+    return Restaurant.decNSaved(restaurant)
   }
 }
 

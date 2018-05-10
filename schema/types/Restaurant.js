@@ -3,10 +3,12 @@ const {
   GraphQLString,
   GraphQLID,
   GraphQLList,
-  GraphQLInt
+  GraphQLInt,
+  GraphQLFloat,
+  GraphQLBoolean
 } = require('graphql')
 
-const { Food } = require('../../models')
+const { Food, User } = require('../../models')
 
 const AddressType = require('./Address')
 const FoodType = require('./Food')
@@ -29,13 +31,26 @@ const RestaurantType = new GraphQLObjectType({
     },
     address: { type: AddressType },
     nsaved: { type: GraphQLInt },
-    nsale: { type: GraphQLInt },
-    price: { type: GraphQLInt },
-    nrating: { type: GraphQLInt },
-    rating: { type: GraphQLInt },
+    avgrating: {
+      type: GraphQLFloat,
+      resolve: ({ avgrating }) => avgrating.toFixed(1)
+    },
+    avgprice: {
+      type: GraphQLFloat,
+      resolve: ({ avgprice }) => avgprice.toFixed(1)
+    },
     foods: {
       type: new GraphQLList(FoodType),
       resolve: ({ id }) => Food.loadByRestaurant(id)
+    },
+    issaved: {
+      type: GraphQLBoolean,
+      resolve: ({ id }, _, { user }) => {
+        if (user) {
+          return User.isSaved(user._id, id)
+        }
+        return false
+      }
     }
   }
 })

@@ -3,6 +3,7 @@ const path = require('path')
 const config = {
   DB_PATH: 'mongodb://localhost:27017/take-food-out',
   SERVER_PORT: 8080,
+  SOCKET_PORT: 3000,
   PUBLIC_PATH: path.join(__dirname, 'public'),
   SALT_ROUNDS: 10,
   THUMB_NAIL_USER: 'default_user_thumbnail.png',

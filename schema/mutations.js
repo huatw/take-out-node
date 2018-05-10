@@ -38,6 +38,7 @@ const {
 const Mutation = new GraphQLObjectType({
   name: 'Mutation',
   fields: () => ({
+    /* User mutations */
     logout: {
       type: GraphQLBoolean,
       resolve: requireLoginHOF((_, args, req) => {
@@ -75,7 +76,7 @@ const Mutation = new GraphQLObjectType({
         password: { type: new GraphQLNonNull(GraphQLString) },
         nickname: { type: new GraphQLNonNull(GraphQLString) }
       },
-      resolve: requireLoginHOF(async (_, { password, nickname }, req) => {
+      resolve: requireLoginHOF(async (_, { password, nickname }, { user }) => {
         const patch = {}
 
         if (nickname !== '') {
@@ -86,32 +87,77 @@ const Mutation = new GraphQLObjectType({
           patch.password = password
         }
 
-        Object.assign(req.user, patch)
+        Object.assign(user, patch)
 
-        return req.user.save()
+        return user.save()
       })
     },
+    /* Saved mutations */
+    saveRestaurant: {
+      type: RestaurantType,
+      args: {
+        restaurantId: { type: new GraphQLNonNull(GraphQLID) }
+      },
+      resolve: requireLoginHOF((_, { restaurantId }, { user }) =>
+        User.saveRestaurant(user._id, restaurantId)
+      )
+    },
+    unsaveRestaurant: {
+      type: RestaurantType,
+      args: {
+        restaurantId: { type: new GraphQLNonNull(GraphQLID) }
+      },
+      resolve: requireLoginHOF((_, { restaurantId }, { user }) =>
+        User.unsaveRestaurant(user._id, restaurantId)
+      )
+    },
+    /* Order mutations */
     createOrder: {
       type: OrderType,
-      arges: {
+      args: {
         foods: { type: new GraphQLNonNull(new GraphQLList(GraphQLID)) },
         quantities: { type: new GraphQLNonNull(new GraphQLList(GraphQLInt)) },
         address: { type: new GraphQLNonNull(GraphQLString) },
-        restaurant: { type: new GraphQLNonNull(GraphQLID) }
+        restaurantId: { type: new GraphQLNonNull(GraphQLID) }
       },
-      resolve: requireLoginHOF((_, { foods, quantities, address, restaurant }, { user }) => {
+      resolve: requireLoginHOF((_, { foods, quantities, address, restaurantId }, { user }) => {
         if (foods.length !== quantities.length) {
           throw Error('foods and quantities should have same length.')
         }
 
-        return Order.create({ foods, quantities, full: address, restaurant, user: user._id })
+        return Order.create({
+          foods,
+          quantities,
+          full: address,
+          restaurant: restaurantId,
+          user: user._id
+        })
       })
     },
-    // cancelOrder: {},
-    // finishOrder: {},
-    // createRate: {},
+    completeOrder: {
+      type: OrderType,
+      args: {
+        orderId: { type: new GraphQLNonNull(GraphQLID) },
+        content: { type: GraphQLString },
+        stars: { type: GraphQLInt }
+      },
+      resolve: requireLoginHOF((_, { orderId, content, stars }, { user }) =>
+        Order.complete(orderId, user._id, content, stars)
+      )
+    },
+    cancelOrder: {
+      type: OrderType,
+      args: {
+        orderId: { type: new GraphQLNonNull(GraphQLID) },
+      },
+      resolve: requireLoginHOF((_, { orderId, content, stars }, { user }) =>
+        Order.cancel(orderId, user._id)
+      )
+    },
+    /* Rating Mutation */
+    // updateRate: {},
     // removeRate: {},
-    /**owner operation**/
+    /* Owner Mutation */
     // createRestaurant: {},
     // updateRestaurant: {},
     // removeRestaurant: {},

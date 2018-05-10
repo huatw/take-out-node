@@ -8,6 +8,7 @@ const CHEAP = 2
 const QUICK = 3
 const SAVED = 4
 const HOT = 5
+const RATING = 6
 
 const SearchType = new GraphQLEnumType({
   name: 'Search',
@@ -36,6 +37,10 @@ const SearchType = new GraphQLEnumType({
     HOT: {
       value: HOT,
       description: 'search by popularity'
+    },
+    RATING: {
+      value: RATING,
+      description: 'search by rating'
     }
   }
 })
@@ -47,5 +52,6 @@ module.exports = {
   CHEAP,
   QUICK,
   SAVED,
-  HOT
+  HOT,
+  RATING
 }

@@ -2,7 +2,8 @@ const {
   GraphQLObjectType,
   GraphQLString,
   GraphQLID,
-  GraphQLInt
+  GraphQLInt,
+  GraphQLList
 } = require('graphql')
 
 const { User, Restaurant } = require('../../models')
@@ -29,7 +30,7 @@ const OrderType = new GraphQLObjectType({
       resolve: ({ finishtime }) => finishtime && finishtime.toISOString()
     },
     address: { type: AddressType },
-    orderFoods: { type: OrderFoodType },
+    orderFoods: { type: new GraphQLList(OrderFoodType) },
     rating: { type: RatingType },
     user: {
       type: UserType,
