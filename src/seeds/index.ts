@@ -1,7 +1,10 @@
-const mongoose = require('mongoose')
+import mongoose from 'mongoose'
 
-const { DB_PATH } = require('../config')
-const { Food, Order, Restaurant, User } = require('../models')
+import { DB_PATH } from '../config'
+import Food, { IFood } from '../models/Food'
+import Order from '../models/Order'
+import Restaurant, { IRestaurant } from '../models/Restaurant'
+import User, { IUser } from '../models/User'
 
 const users = require('./users.json')
 const restaurants = require('./restaurants.json')
@@ -10,10 +13,10 @@ const orders = require('./orders.json')
 
 mongoose.Promise = global.Promise
 
-const addRestaurants = async (restaurants) =>
+const addRestaurants = async (restaurants: any[]): Promise<IRestaurant[]> =>
   Restaurant.insertMany(restaurants)
 
-const addUsers = async (users) => Promise.all(
+const addUsers = async (users: any[]): Promise<IUser[]> => Promise.all(
   users.map(user => User.register({ ...user }))
 )
 
@@ -36,7 +39,7 @@ const mockSave = async (userIds, restaurantIds) => Promise.all(
  * @param  {ID[]}     restaurantIds
  * @return {Food[][]} restaurant array of food array
  */
-const addFoods = async (foods, restaurantIds) => Promise.all(
+const addFoods = async (foods: any[], restaurantIds: any[]): Promise<IFood[][]> => Promise.all(
   restaurantIds.map((restaurant, index) => {
     const refinedFoods = foods.map(
       ({ name, cuisine, description, price }) => ({
@@ -130,7 +133,7 @@ async function runSeed () {
 }
 
 mongoose
-  .connect(DB_PATH, { autoIndex: true })
+  .connect(DB_PATH)
   .then(() => mongoose.connection.db.dropDatabase())
   .then(() => runSeed())
   .then(() => console.log('Seeding successfully! Ctrl-C to quit.'))
