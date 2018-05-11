@@ -1,12 +1,12 @@
-const mongoose = require('mongoose')
-const bcrypt = require('bcrypt')
+import mongoose from 'mongoose'
+import bcrypt from 'bcrypt'
 
-const AddressSchema = require('./Address')
-const Restaurant = require('./Restaurant')
+import AddressSchema, { IAddress } from './Address'
+import Restaurant, { IRestaurant } from './Restaurant'
 
-const { THUMB_NAIL_USER, SALT_ROUNDS } = require('../config')
+import { THUMB_NAIL_USER, SALT_ROUNDS } from '../config'
 
-const UserSchema = mongoose.Schema({
+const UserSchema = new mongoose.Schema({
   username: {// index
     type: String,
     unique: true,
@@ -28,13 +28,13 @@ const UserSchema = mongoose.Schema({
   },
   saved: [{
     type: mongoose.Schema.Types.ObjectId,
-    ref : 'Restaurant'
+    ref: 'Restaurant'
   }],
   address: AddressSchema // not using it yet.
 })
 
 // auto hash password before saving
-UserSchema.pre('save', async function (next) {
+UserSchema.pre('save', async function (this: any, next) {
   if (this.isModified('password')) {
     const password = await bcrypt.hash(this.password, SALT_ROUNDS)
     this.password = password
@@ -52,7 +52,7 @@ UserSchema.methods = {
 }
 
 UserSchema.statics = {
-  load (username) {
+  load (username: string) {
     return this.findOne({ username }).populate('saved')
   },
   register ({ username, password, nickname }) {
@@ -60,18 +60,18 @@ UserSchema.statics = {
 
     return user.save()
   },
-  async isSaved (_id, restaurant) {
+  async isSaved (_id, restaurantId) {
     const user = await this.findOne({
       _id,
-      saved: restaurant
+      saved: restaurantId
     })
 
-    return user ? true : false
+    return !!user
   },
   async saveRestaurant (_id, restaurant) {
     await this.findByIdAndUpdate(
       _id,
-      { $push: { saved: restaurant} },
+      { $push: { saved: restaurant } },
       { new: true }
     )
 
@@ -80,7 +80,7 @@ UserSchema.statics = {
   async unsaveRestaurant (_id, restaurant) {
     await this.findByIdAndUpdate(
       _id,
-      { $pull: { saved: restaurant} },
+      { $pull: { saved: restaurant } },
       { new: true }
     )
 
@@ -88,4 +88,24 @@ UserSchema.statics = {
   }
 }
 
-module.exports = mongoose.model('User', UserSchema)
+export interface IUser extends mongoose.Document {
+  username: string
+  password: string
+  nickname: string
+  thumbnail: string
+  createtime: Date
+  saved: (typeof mongoose.Schema.Types.ObjectId)[]
+  address: IAddress
+  comparePassword: (password: string) => Promise<boolean>
+}
+
+export interface IUserModel extends mongoose.Model<IUser> {
+  load: (username: string) => Promise<IUser>
+  register: (any) => Promise<IUser>
+  isSaved: (_id: any, restaurantId: any) => Promise<boolean>
+  saveRestaurant: (_id: any, restaurantId: any) => Promise<IRestaurant>
+  unsaveRestaurant: (_id: any, restaurantId: any) => Promise<IRestaurant>
+}
+
+const User: IUserModel = mongoose.model<IUser, IUserModel>('User', UserSchema)
+export default User

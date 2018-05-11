@@ -1,10 +1,10 @@
-const axios = require('axios')
+import axios from 'axios'
 
-const getAddress = async (longitude, latitude) => {
+export const getAddress = async (longitude: number, latitude: number) => {
   // const { data } = await axios.get(`http://maps.googleapis.com/maps/api/geocode/json?latlng=${longitude},${latitude}`)
 
   // fake full address
-  const data = { results: [{ formatted_address: 'fake full address.' }] }
+  const data = { results: [{ formatted_address: '73 E 4th St, New York, NY 10003' }] }
 
   // google api does not support state city ....
   return {
@@ -14,8 +14,4 @@ const getAddress = async (longitude, latitude) => {
     city: '',
     street: ''
   }
-}
-
-module.exports = {
-  getAddress
 }

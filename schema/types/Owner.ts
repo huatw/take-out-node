@@ -1,14 +1,14 @@
-const {
+import {
   GraphQLObjectType,
   GraphQLString,
   GraphQLID
-} = require('graphql')
+} from 'graphql'
 
 const OwnerType = new GraphQLObjectType({
   name: 'OwnerType',
   fields: {
     id: { type: GraphQLID },
-    username: { type: GraphQLString },
+    ownername: { type: GraphQLString },
     nickname: { type: GraphQLString },
     thumbnail: { type: GraphQLString },
     createtime: {
@@ -18,4 +18,4 @@ const OwnerType = new GraphQLObjectType({
   }
 })
 
-module.exports = OwnerType
+export default OwnerType

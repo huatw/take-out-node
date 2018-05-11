@@ -1,11 +1,11 @@
-const {
+import {
   GraphQLObjectType,
   GraphQLString,
   GraphQLList
-} = require('graphql')
+} from 'graphql'
 
-const AddressType = require('./Address')
-const RestaurantType = require('./Restaurant')
+import AddressType from './Address'
+import RestaurantType from './Restaurant'
 
 const UserType = new GraphQLObjectType({
   name: 'UserType',
@@ -22,4 +22,4 @@ const UserType = new GraphQLObjectType({
   }
 })
 
-module.exports = UserType
+export default UserType

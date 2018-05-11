@@ -1,14 +1,12 @@
-const {
+import {
   GraphQLObjectType,
   GraphQLID,
   GraphQLInt
-} = require('graphql')
+} from 'graphql'
 
-const { Food } = require('../../models')
+import Food from '../../models/Food'
 
-const OrderType = require('./Order')
-const UserType = require('./User')
-const FoodType = require('./Food')
+import FoodType from './Food'
 
 const OrderFoodType = new GraphQLObjectType({
   name: 'OrderFoodType',
@@ -18,8 +16,8 @@ const OrderFoodType = new GraphQLObjectType({
     food: {
       type: FoodType,
       resolve: ({ food }) => Food.load(food)
-    },
+    }
   }
 })
 
-module.exports = OrderFoodType
+export default OrderFoodType

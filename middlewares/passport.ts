@@ -1,10 +1,11 @@
-const passport = require('passport')
-const LocalStrategy = require('passport-local')
-const { User } = require('../models')
+import express from 'express'
+import passport from 'passport'
+import LocalStrategy from 'passport-local'
+import User, { IUser } from '../models/User'
 
-function configPassport (app) {
+function configPassport (app: express.Express): void {
   passport.use(new LocalStrategy(
-    async (username, cleanPassword, verified) => {
+    async (username: string, cleanPassword: string, verified) => {
       try {
         const user = await User.load(username)
 
@@ -20,18 +21,21 @@ function configPassport (app) {
     }
   ))
 
+  // interface IUser {
+  //   username: string
+  // }
+
   // pass username to `deserializeUser`
-  passport.serializeUser((user, cb) => {
+  passport.serializeUser((user: IUser, cb) => {
     cb(null, user.username)
   })
 
   // set value to `req.user`
-  passport.deserializeUser(async (username, cb) => {
+  passport.deserializeUser(async (username: string, cb) => {
     try {
       const user = await User.load(username)
       cb(null, user)
-    }
-    catch (e) {
+    } catch (e) {
       cb(e)
     }
   })
@@ -40,4 +44,4 @@ function configPassport (app) {
   app.use(passport.session())
 }
 
-module.exports = configPassport
+export default configPassport

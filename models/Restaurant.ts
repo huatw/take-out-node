@@ -1,10 +1,9 @@
-const mongoose = require('mongoose')
+import mongoose from 'mongoose'
 
-const AddressSchema = require('./Address')
+import AddressSchema, { IAddress } from './Address'
+import { THUMB_NAIL_RESTAURANT } from '../config'
 
-const { THUMB_NAIL_RESTAURANT } = require('../config')
-
-const RestaurantSchema = mongoose.Schema({
+const RestaurantSchema = new mongoose.Schema({
   // _id auto gen
   address: AddressSchema,
   // owner: { // index, foreign key
@@ -96,14 +95,14 @@ RestaurantSchema.statics = {
   incNSaved (_id) {
     return this.findByIdAndUpdate(
       _id,
-      { $inc: { nsaved: 1 }},
+      { $inc: { nsaved: 1 } },
       { new: true }
     )
   },
   decNSaved (_id) {
     return this.findByIdAndUpdate(
       _id,
-      { $inc: { nsaved: -1 }},
+      { $inc: { nsaved: -1 } },
       { new: true }
     )
   },
@@ -137,7 +136,7 @@ RestaurantSchema.statics = {
       'address.gps': {
         $near: gps,
         $maxDistance: 10 / 111 // 10km
-      },
+      }
     }).limit(20)
   },
   loadByPrice (gps) {
@@ -183,4 +182,37 @@ RestaurantSchema.statics = {
   }
 }
 
-module.exports = mongoose.model('Restaurant', RestaurantSchema)
+export interface IRestaurant extends mongoose.Document {
+  address: IAddress
+  name: string
+  cuisine: string
+  description: string
+  thumbnail: string
+  createtime: Date
+  updatetime: Date
+  /* aggregate data */
+  nsaved: number
+  nsale: number
+  price: number
+  avgprice: number
+  nrating: number
+  rating: number
+  avgrating: number
+}
+
+export interface IRestaurantModel extends mongoose.Model<IRestaurant> {
+  updateRating: (_id: any, rating: number) => Promise<IRestaurant>
+  updateSale: (_id: any, price: number) => Promise<IRestaurant>
+  incNSaved: (_id: any) => Promise<IRestaurant>
+  decNSaved: (_id: any) => Promise<IRestaurant>
+  load: (_id: any) => Promise<IRestaurant>
+  loadByName: (name: string, gps: number[]) => Promise<IRestaurant[]>
+  loadByCuisine: (cuisine: string, gps: number[]) => Promise<IRestaurant[]>
+  loadByDistance: (gps: number[]) => Promise<IRestaurant[]>
+  loadByPrice: (gps: number[]) => Promise<IRestaurant[]>
+  loadByHot: (gps: number[]) => Promise<IRestaurant[]>
+  loadByRating: (gps: number[]) => Promise<IRestaurant[]>
+}
+
+const Restaurant: IRestaurantModel = mongoose.model<IRestaurant, IRestaurantModel>('Restaurant', RestaurantSchema)
+export default Restaurant

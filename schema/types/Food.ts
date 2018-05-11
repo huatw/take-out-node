@@ -1,12 +1,13 @@
-const {
+import {
   GraphQLObjectType,
   GraphQLString,
   GraphQLID,
   GraphQLBoolean,
   GraphQLInt
-} = require('graphql')
+} from 'graphql'
 
-const { Restaurant } = require('../../models')
+import Restaurant from '../../models/Restaurant'
+import RestaurantType from './Restaurant'
 
 const FoodType = new GraphQLObjectType({
   name: 'FoodType',
@@ -23,10 +24,10 @@ const FoodType = new GraphQLObjectType({
       resolve: ({ createtime }) => createtime.toISOString()
     },
     restaurant: {
-      type: require('./Restaurant'), // circular dependency...
+      type: RestaurantType, // circular dependency...
       resolve: ({ restaurant }) => Restaurant.load(restaurant)
     }
   })
 })
 
-module.exports = FoodType
+export default FoodType

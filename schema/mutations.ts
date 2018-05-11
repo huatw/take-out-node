@@ -1,4 +1,4 @@
-const {
+import {
   GraphQLObjectType,
   GraphQLID,
   GraphQLString,
@@ -6,34 +6,25 @@ const {
   GraphQLList,
   GraphQLInt,
   GraphQLBoolean
-} = require('graphql')
+} from 'graphql'
 
-const UserType = require('./types/User')
-const AddressType = require('./types/Address')
-const OwnerType = require('./types/Owner')
-const RestaurantType = require('./types/Restaurant')
-const FoodType = require('./types/Food')
-const OrderType = require('./types/Order')
-const {
-  SearchType,
-  NAME,
-  CUISINE,
-  CHEAP,
-  QUICK,
-  SAVED,
-  HOT
-} = require('./types/Search')
+import AddressType from './types/Address'
+import UserType from './types/User'
+import OwnerType from './types/Owner'
+import RestaurantType from './types/Restaurant'
+import FoodType from './types/Food'
+import OrderType from './types/Order'
 
-const {
+import {
   requireLogoutHOF,
   requireLoginHOF,
   login
-} = require('../middlewares/authorization')
+} from '../middlewares/authorization'
 
-const {
+import {
   User,
   Order
-} = require('../models')
+} from '../models'
 
 const Mutation = new GraphQLObjectType({
   name: 'Mutation',
@@ -77,7 +68,11 @@ const Mutation = new GraphQLObjectType({
         nickname: { type: new GraphQLNonNull(GraphQLString) }
       },
       resolve: requireLoginHOF(async (_, { password, nickname }, { user }) => {
-        const patch = {}
+        interface IPatch {
+          nickname?: string
+          password?: string
+        }
+        const patch: IPatch = {}
 
         if (nickname !== '') {
           patch.nickname = nickname
@@ -148,7 +143,7 @@ const Mutation = new GraphQLObjectType({
     cancelOrder: {
       type: OrderType,
       args: {
-        orderId: { type: new GraphQLNonNull(GraphQLID) },
+        orderId: { type: new GraphQLNonNull(GraphQLID) }
       },
       resolve: requireLoginHOF((_, { orderId, content, stars }, { user }) =>
         Order.cancel(orderId, user._id)
@@ -167,4 +162,4 @@ const Mutation = new GraphQLObjectType({
   })
 })
 
-module.exports = Mutation
+export default Mutation

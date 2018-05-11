@@ -1,14 +1,14 @@
-const {
+import {
   GraphQLEnumType
-} = require('graphql')
+} from 'graphql'
 
-const NAME = 0
-const CUISINE = 1
-const CHEAP = 2
-const QUICK = 3
-const SAVED = 4
-const HOT = 5
-const RATING = 6
+export const NAME = 0
+export const CUISINE = 1
+export const CHEAP = 2
+export const QUICK = 3
+export const SAVED = 4
+export const HOT = 5
+export const RATING = 6
 
 const SearchType = new GraphQLEnumType({
   name: 'Search',
@@ -45,13 +45,4 @@ const SearchType = new GraphQLEnumType({
   }
 })
 
-module.exports = {
-  SearchType,
-  NAME,
-  CUISINE,
-  CHEAP,
-  QUICK,
-  SAVED,
-  HOT,
-  RATING
-}
+export default SearchType

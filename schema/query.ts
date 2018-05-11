@@ -1,21 +1,20 @@
-const {
+import {
   GraphQLObjectType,
   GraphQLList,
   GraphQLID,
   GraphQLString,
   GraphQLFloat,
   GraphQLNonNull
-} = require('graphql')
+} from 'graphql'
 
-const UserType = require('./types/User')
-const AddressType = require('./types/Address')
-const OwnerType = require('./types/Owner')
-const RestaurantType = require('./types/Restaurant')
-const FoodType = require('./types/Food')
-const OrderType = require('./types/Order')
-const RatingType = require('./types/Rating')
-const {
-  SearchType,
+import AddressType from './types/Address'
+import UserType from './types/User'
+import OwnerType from './types/Owner'
+import RestaurantType from './types/Restaurant'
+import FoodType from './types/Food'
+import OrderType from './types/Order'
+import RatingType from './types/Rating'
+import SearchType, {
   NAME,
   CUISINE,
   CHEAP,
@@ -23,20 +22,20 @@ const {
   SAVED,
   RATING,
   HOT
-} = require('./types/Search')
+} from './types/Search'
 
-const {
+import {
   requireLogoutHOF,
   requireLoginHOF
-} = require('../middlewares/authorization')
+} from '../middlewares/authorization'
 
-const {
+import {
   Restaurant,
   Order,
   Food,
-} = require('../models')
+} from '../models'
 
-const { getAddress } = require('../middlewares/gps')
+import { getAddress } from '../middlewares/gps'
 
 const Query = new GraphQLObjectType({
   name: 'Query',
@@ -109,4 +108,4 @@ const Query = new GraphQLObjectType({
   })
 })
 
-module.exports = Query
+export default Query

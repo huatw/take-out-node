@@ -1,22 +1,22 @@
-const mongoose = require('mongoose')
+import mongoose from 'mongoose'
 
-const AddressSchema = require('./Address')
-const OrderFoodShema = require('./OrderFood')
-const RatingSchema = require('./Rating')
-const Food = require('./Food')
-const Restaurant = require('./Restaurant')
+import AddressSchema, { IAddress } from './Address'
+import OrderFoodShema, { IOrderFood } from './OrderFood'
+import RatingSchema, { IRating } from './Rating'
+import Food from './Food'
+import Restaurant from './Restaurant'
 
-const OrderSchema = mongoose.Schema({
+const OrderSchema = new mongoose.Schema({
   // _id auto gen
   restaurant: { // foreign key
     type: mongoose.Schema.Types.ObjectId,
-    ref : 'Restaurant',
+    ref: 'Restaurant',
     index: true,
     required: true
   },
   user: { // index, foreign key
     type: mongoose.Schema.Types.ObjectId,
-    ref : 'User',
+    ref: 'User',
     index: true,
     required: true
   },
@@ -52,7 +52,7 @@ OrderSchema.statics = {
    * @param  {_id} options.user            user _id
    * @return {Order}
    */
-  async create ({ foods, quantities, full, restaurant, user }) {
+  async create({ foods, quantities, full, restaurant, user }) {
     const foodQuanMap = foods.reduce(
       (acc, id, index) => {
         acc[id] = quantities[index]
@@ -86,7 +86,7 @@ OrderSchema.statics = {
 
     return order.save()
   },
-  async complete (_id, user, content, stars = 5) { // check user
+  async complete(_id, user, content, stars = 5) { // check user
     const order = await this.findOneAndUpdate(
       { _id, user },
       {
@@ -113,7 +113,7 @@ OrderSchema.statics = {
 
     return order
   },
-  async cancel (_id, user) {
+  async cancel(_id, user) {
     const order = await this.findOneAndUpdate(
       { _id, user },
       {
@@ -127,14 +127,14 @@ OrderSchema.statics = {
 
     return order
   },
-  load (_id) {
+  load(_id) {
     return this.findById(_id)
   },
-  loadByUser (user) {
+  loadByUser(user) {
     return this.find({ user })
       .sort({ createtime: -1 })
   },
-  async loadRatingByRestaurant (restaurant) {
+  async loadRatingByRestaurant(restaurant) {
     const orders = await this
       .find({ restaurant })
       .populate('user')
@@ -155,4 +155,28 @@ OrderSchema.statics = {
   }
 }
 
-module.exports = mongoose.model('Order', OrderSchema)
+export interface IOrder extends mongoose.Document {
+  restaurant: typeof mongoose.Schema.Types.ObjectId
+  user: typeof mongoose.Schema.Types.ObjectId
+  orderFoods: IOrderFood[]
+  rating: IRating
+  address: IAddress
+  quantity: number
+  price: number
+  status: number
+  createtime: Date
+  finishtime: Date
+}
+
+export interface IOrderModel extends mongoose.Model<IOrder> {
+  load: (_id: any) => Promise<IOrder>
+  loadByUser: (user: any) => Promise<IOrder[]>
+  loadByRestaurant: (restaurant: any) => Promise<IOrder[]>
+  loadRatingByRestaurant: (restaurant: any) => Promise<IRating[]>
+  // create: (any) => Promise<IOrder>
+  complete: (_id: any, user: any, content: string, stars: number) => Promise<IOrder>
+  cancel: (_id: any, user: any) => Promise<IOrder>
+}
+
+const Order: IOrderModel = mongoose.model<IOrder, IOrderModel>('Order', OrderSchema)
+export default Order

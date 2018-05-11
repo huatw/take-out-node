@@ -1,7 +1,7 @@
 const mongoose = require('mongoose')
 
 const { DB_PATH } = require('../config')
-const { Food, Order, Owner, Rating, Restaurant, User } = require('../models')
+const { Food, Order, Restaurant, User } = require('../models')
 
 const users = require('./users.json')
 const restaurants = require('./restaurants.json')
@@ -17,7 +17,6 @@ const addUsers = async (users) => Promise.all(
   users.map(user => User.register({ ...user }))
 )
 
-
 /**
  * user1 add 1 restaurants, user2 add 2...
  * @param  {User[]} userArr
@@ -30,7 +29,6 @@ const mockSave = async (userIds, restaurantIds) => Promise.all(
       .map(restaurantId => User.saveRestaurant(userId, restaurantId))
   ))
 )
-
 
 /**
  * add foods to every restaurant

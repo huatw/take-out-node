@@ -1,19 +1,21 @@
-const path = require('path')
-const express = require('express')
-const expressGraphQL = require('express-graphql')
-const bodyParser = require('body-parser')
-const cookieParser = require('cookie-parser')
-const session = require('express-session')
-const morgan = require('morgan')
-const cors = require('cors')
-// const MongoStore = require('connect-mongo')(session)
-const mongoose = require('mongoose')
-mongoose.Promise = global.Promise
+import express from 'express'
+import expressGraphQL from 'express-graphql'
+import bodyParser from 'body-parser'
+import cookieParser from 'cookie-parser'
+import session from 'express-session'
+import morgan from 'morgan'
+import cors from 'cors'
+import mongoose from 'mongoose'
+// import connectMongo from 'connect-mongo'
 
-const configPassport = require('./middlewares/passport')
-const schema = require('./schema')
-const { PUBLIC_PATH, SERVER_PORT, DB_PATH } = require('./config')
+import configPassport from './middlewares/passport'
+import schema from './schema'
+import { PUBLIC_PATH, SERVER_PORT, DB_PATH } from './config'
+
 const isProd = process.env.NODE_ENV === 'production'
+
+// const MongoStore = connectMongo(session)
+mongoose.Promise = global.Promise
 
 const app = express()
 
@@ -33,13 +35,13 @@ app.use(session({
 }))
 configPassport(app)
 
-app.use('/graphql', expressGraphQL(req => ({
+app.use('/graphql', expressGraphQL((req) => ({
   schema,
   graphiql: !isProd,
   // context: { user: req.user}
   formatError: ({ message, locations, stack, path }) => !isProd
     ? ({ message, locations, path, stack })
-    : ({ message})
+    : ({ message })
 })))
 
 // 404 handler
@@ -58,9 +60,9 @@ const startServer = () => app.listen(SERVER_PORT, () => {
 })
 
 mongoose
-  .connect(DB_PATH, { autoIndex: true })
+  .connect(DB_PATH)
   .then(
     () => console.log(`mongo started at port: ${DB_PATH}`),
-    e => console.log('mongo error:', e)
+    (e) => console.log('mongo error:', e)
   )
   .then(startServer)

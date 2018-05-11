@@ -1,10 +1,9 @@
-const {
+import {
   GraphQLObjectType,
   GraphQLString,
   GraphQLFloat,
-  GraphQLList,
-  GraphQLID
-} = require('graphql')
+  GraphQLList
+} from 'graphql'
 
 const AddressType = new GraphQLObjectType({
   name: 'AddressType',
@@ -17,4 +16,4 @@ const AddressType = new GraphQLObjectType({
   }
 })
 
-module.exports = AddressType
+export default AddressType

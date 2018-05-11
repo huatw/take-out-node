@@ -1,47 +1,55 @@
-const path = require('path')
-const http = require('http')
-const express = require('express')
-const socketio = require('socket.io')
-const { SOCKET_PORT } = require('../config')
+import http from 'http'
+import express from 'express'
+import socketio from 'socket.io'
+import { SOCKET_PORT } from '../config'
 
 const app = express()
-const server = http.Server(app)
+const server = new http.Server(app)
 const websocket = socketio(server)
 const io = websocket.of('/io')
 
-const log = (...args) => {
+const log = (...args: any[]) => {
   console.log('='.repeat(50))
   console.log(...args)
 }
-const idUserMap = {}
+
+interface IdUserMapV {
+  from: string
+  to: string
+}
+
+interface IdUserMap {
+  [id: string]: IdUserMapV | null
+}
+const idUserMap: IdUserMap = {}
 
 io.use((socket, next) => {
   const { from, to } = socket.handshake.query
   /* check from to exist in db */
   // return next(new Error('authentication error'))
-  idUserMap[socket.id] = { from, to}
+  idUserMap[socket.id] = { from, to }
 
   return next()
 })
 
 io.on('connection', function (socket) {
-  log('USER CONNECTED:', idUserMap[socket.id].from)
+  log('USER CONNECTED:', (<IdUserMapV>idUserMap[socket.id]).from)
 
   socket.on('disconnect', function () {
-    log('USER DISCONNECTED:', idUserMap[socket.id].from)
+    log('USER DISCONNECTED:', (<IdUserMapV>idUserMap[socket.id]).from)
     idUserMap[socket.id] = null
   })
 
   socket.on('message', function (message) {
-    log(`FROM USER ${idUserMap[socket.id].from}:`, message)
+    log(`FROM USER ${(<IdUserMapV>idUserMap[socket.id]).from}:`, message)
   })
 })
 
 const stdin = process.openStdin()
-let restaurant_id = 0
+let restaurantId = 0
 stdin.addListener('data', (message) => {
   const msg = {
-    _id: restaurant_id++,
+    _id: restaurantId++,
     text: message.toString().trim(),
     createdAt: new Date(),
     user: { _id: 'restaurant_owner' }

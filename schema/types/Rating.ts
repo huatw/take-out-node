@@ -1,12 +1,12 @@
-const {
+import {
   GraphQLObjectType,
   GraphQLString,
   GraphQLID,
   GraphQLInt
-} = require('graphql')
+} from 'graphql'
 
-const OrderType = require('./Order')
-const UserType = require('./User')
+import OrderType from './Order'
+import UserType from './User'
 
 const RatingType = new GraphQLObjectType({
   name: 'RatingType',
@@ -22,4 +22,4 @@ const RatingType = new GraphQLObjectType({
   }
 })
 
-module.exports = RatingType
+export default RatingType
