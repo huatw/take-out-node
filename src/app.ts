@@ -6,18 +6,18 @@ import session from 'express-session'
 import morgan from 'morgan'
 import cors from 'cors'
 import mongoose from 'mongoose'
-// import connectMongo from 'connect-mongo'
+import connectRedis from 'connect-redis'
 
 import configPassport from './middlewares/passport'
 import schema from './schema'
-import { PUBLIC_PATH, SERVER_PORT, DB_PATH } from './config'
+import { PUBLIC_PATH, SERVER_PORT, DB_PATH, SESSION_SECRET } from './config'
 
 const isProd = process.env.NODE_ENV === 'production'
 
-// const MongoStore = connectMongo(session)
 mongoose.Promise = global.Promise
 
 const app = express()
+const RedisStore = connectRedis(session)
 
 app.use(cors({}))
 
@@ -29,9 +29,10 @@ app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: true }))
 app.use(cookieParser())
 app.use(session({
+  store: new RedisStore,
   resave: false, // don't save session if unmodified
   saveUninitialized: false, // don't create session until something stored
-  secret: '!@#$%^&*'
+  secret: SESSION_SECRET
 }))
 configPassport(app)
 

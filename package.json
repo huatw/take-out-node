@@ -4,15 +4,34 @@
   "author": "huatw",
   "license": "MIT",
   "scripts": {
-    "start": "NODE_ENV=production ts-node app.ts",
-    "dev": "nodemon --exec ts-node app.ts",
-    "io": "nodemon --exec ts-node websocket",
-    "seed": "node seeds"
+    "start": "NODE_ENV=production ts-node src/app.ts",
+    "dev": "nodemon --exec ts-node src/app.ts",
+    "io": "nodemon --exec ts-node src/websocket",
+    "seed": "node src/seeds",
+    "test": "jest"
+  },
+  "jest": {
+    "roots": [
+      "<rootDir>"
+    ],
+    "transform": {
+      "^.+\\.tsx?$": "ts-jest"
+    },
+    "testRegex": "(/__tests__/.*|(\\.|/)(test|spec))\\.tsx?$",
+    "moduleFileExtensions": [
+      "ts",
+      "tsx",
+      "js",
+      "jsx",
+      "json",
+      "node"
+    ]
   },
   "dependencies": {
     "axios": "^0.18.0",
     "bcrypt": "^2.0.1",
     "body-parser": "^1.18.2",
+    "connect-redis": "^3.3.3",
     "cookie-parser": "^1.4.3",
     "cors": "^2.8.4",
     "express": "^4.16.2",
@@ -34,12 +53,15 @@
     "@types/express-graphql": "^0.6.1",
     "@types/express-session": "^1.15.8",
     "@types/graphql": "^0.13.1",
+    "@types/jest": "^22.2.3",
     "@types/mongoose": "^5.0.13",
     "@types/morgan": "^1.7.35",
     "@types/node": "^10.0.8",
     "@types/passport": "^0.4.5",
     "@types/socket.io": "^1.4.33",
+    "jest": "^22.4.3",
     "nodemon": "^1.12.1",
+    "ts-jest": "^22.4.6",
     "ts-node": "^6.0.3",
     "typescript": "^2.8.3"
   }

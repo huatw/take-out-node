@@ -8,6 +8,7 @@ export const SALT_ROUNDS: number = 10
 export const THUMB_NAIL_USER: string = 'default_user_thumbnail.png'
 export const THUMB_NAIL_FOOD: string = 'default_user_thumbnail.png'
 export const THUMB_NAIL_RESTAURANT: string = 'default_user_thumbnail.png'
+export const SESSION_SECRET: string = '!@#$%^&*'
 
 export default {
   DB_PATH,
@@ -17,5 +18,6 @@ export default {
   SALT_ROUNDS,
   THUMB_NAIL_USER,
   THUMB_NAIL_FOOD,
-  THUMB_NAIL_RESTAURANT
+  THUMB_NAIL_RESTAURANT,
+  SESSION_SECRET
 }

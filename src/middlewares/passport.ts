@@ -25,12 +25,12 @@ function configPassport (app: express.Express): void {
   //   username: string
   // }
 
-  // pass username to `deserializeUser`
+  // writing session
   passport.serializeUser((user: IUser, cb) => {
     cb(null, user.username)
   })
 
-  // set value to `req.user`
+  // get from session
   passport.deserializeUser(async (username: string, cb) => {
     try {
       const user = await User.load(username)
